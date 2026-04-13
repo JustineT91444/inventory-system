@@ -1,11 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>High-End Inventory System</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-warehouse"></i> Product Inventory System</h1>
+      <p>Real-time sync • Stock analytics • Smart alerts • Export-ready</p>
+    </header>
+
+    <div class="summary-grid">
+      <div class="stat-card">
+        <div class="stat-icon primary"><i class="fas fa-boxes"></i></div>
+        <div>
+          <span class="stat-label">Total SKUs</span>
+          <strong id="totalItems">0</strong>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon accent"><i class="fas fa-dollar-sign"></i></div>
+        <div>
+          <span class="stat-label">Inventory Value</span>
+          <strong id="totalValue">$0.00</strong>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div>
+          <span class="stat-label">Low Stock</span>
+          <strong id="lowStock">0</strong>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon secondary"><i class="fas fa-tags"></i></div>
+        <div>
+          <span class="stat-label">Categories</span>
+          <strong id="categoryCount">0</strong>
+        </div>
+      </div>
+    </div>
+
+    <section class="tool-row">
+      <div class="tool-item">
+        <input type="text" id="search" placeholder="🔍 Search by item name...">
+      </div>
+      <div class="tool-item">
+        <select id="categoryFilter">
+          <option value="All">All categories</option>
+        </select>
+      </div>
+      <div class="tool-item">
+        <select id="sortSelect">
+          <option value="name_asc">Sort: Name A→Z</option>
+          <option value="name_desc">Sort: Name Z→A</option>
+          <option value="qty_desc">Sort: Quantity ✓</option>
+          <option value="qty_asc">Sort: Quantity ↑</option>
+          <option value="value_desc">Sort: Value ✓</option>
+          <option value="value_asc">Sort: Value ↑</option>
+        </select>
+      </div>
+      <div class="tool-item export-box">
+        <button id="exportBtn" class="btn-secondary"><i class="fas fa-file-export"></i> Export CSV</button>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <form id="itemForm" class="form-grid">
+        <input type="hidden" id="editId">
+        <input type="text" id="itemName" placeholder="Item name e.g. Laptop" required>
+        <select id="itemCategory" required>
+          <option value="General">General</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Books">Books</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Food">Food</option>
+        </select>
+        <input type="number" id="itemQty" placeholder="Quantity" min="0" required>
+        <input type="number" id="itemPrice" step="0.01" placeholder="Price" min="0" required>
+        <input type="text" id="itemLocation" placeholder="Location e.g. Main Warehouse">
+        <textarea id="itemDescription" placeholder="Item description / notes" rows="2"></textarea>
+        <div class="button-row">
+          <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> Add Item</button>
+          <button type="button" id="cancelEdit" class="btn-secondary">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="analytics-grid">
+      <div class="analytics-card">
+        <div class="analytics-header">
+          <h2>Inventory Share by Category</h2>
+          <small>Category distribution of current stock value</small>
+        </div>
+        <canvas id="categoryChart"></canvas>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-header">
+          <h2>Top Value Products</h2>
+          <small>Highest inventory value items</small>
+        </div>
+        <canvas id="topValueChart"></canvas>
+      </div>
+    </section>
+
+    <section class="assistant-section">
+      <div class="assistant-card">
+        <div class="assistant-header">
+          <h2>Inventory Assistant</h2>
+          <small>Ask about stock, categories, or edit items using chat commands.</small>
+        </div>
+        <div id="chatLog" class="chat-log">
+          <div class="chat-message bot-message">
+            <span class="chat-bubble">Try commands like “what needs restocking?”, “show electronics”, or “edit item 4”.</span>
+          </div>
+        </div>
+        <form id="chatForm" class="chat-form">
+          <input type="text" id="chatInput" placeholder="Type a command..." autocomplete="off" />
+          <button type="submit" class="btn-primary">Send</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="table-section">
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Value</th>
+            <th>Location</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="itemsBody"></tbody>
+      </table>
+    </section>
+
+    <div id="alerts" class="alerts-box">
+      <i class="fas fa-bell"></i> No low stock alerts
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
+
